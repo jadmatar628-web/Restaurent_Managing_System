@@ -37,4 +37,16 @@ public class OrderItem {
         }
         this.discountPercentage=discountPercentage;
     }
+    public MenuItem getMenuItem(){
+        return menuItem;
+    }
+    public int getQuantity(){
+        return quantity;
+    }
+    public BigDecimal getUnitPrice(){
+        return unitPrice;
+    }
+    public BigDecimal getDiscountPercentage(){
+        return discountPercentage;
+    }
 }
