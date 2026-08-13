@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 public class OrderItem {
     private final MenuItem menuItem;
     private final BigDecimal unitPrice;
-    private int quantity;
     private final BigDecimal discountPercentage;
+    private int quantity;
 
     public OrderItem(MenuItem menuItem, int quantity, BigDecimal unitPrice, BigDecimal discountPercentage) {
         if (menuItem == null) {
@@ -35,18 +35,30 @@ public class OrderItem {
         if (discountPercentage.compareTo(BigDecimal.valueOf(100)) > 0) {
             throw new IllegalArgumentException("Discount cannot exceed 100%");
         }
-        this.discountPercentage=discountPercentage;
+        this.discountPercentage = discountPercentage;
     }
-    public MenuItem getMenuItem(){
+
+    public MenuItem getMenuItem() {
         return menuItem;
     }
-    public int getQuantity(){
+
+    public int getQuantity() {
         return quantity;
     }
-    public BigDecimal getUnitPrice(){
+
+    public BigDecimal getUnitPrice() {
         return unitPrice;
     }
-    public BigDecimal getDiscountPercentage(){
+
+    public BigDecimal getDiscountPercentage() {
         return discountPercentage;
+    }
+
+    public BigDecimal totalPrice() {
+        BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
+
+        BigDecimal discountAmount = subtotal.multiply(discountPercentage).divide(BigDecimal.valueOf(100));
+
+        return subtotal.subtract(discountAmount);
     }
 }
