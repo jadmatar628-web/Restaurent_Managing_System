@@ -4,11 +4,33 @@ import java.time.LocalDate;
 
 public class Employee {
     private EmployeePosition position;
-    private int id;
+    private Integer id;
     private boolean isActive; //true for active false for inactive
     private String name;
     private String phoneNumber;
-    private LocalDate employmentDate;
+    private final LocalDate employmentDate;
+    public Employee(String name, String phoneNumber, LocalDate employmentDate, EmployeePosition position){
+        this.isActive = true;
+        if (name == null ||name.isBlank()) {
+            throw new IllegalArgumentException("Invalid Name Entry");
+        }
+        this.name = name;
+        if (phoneNumber == null ||phoneNumber.isBlank()) {
+            throw new IllegalArgumentException("Invalid Phone Number Entry");
+        }
+        this.phoneNumber = phoneNumber;
+
+        LocalDate maxAllowedDate = LocalDate.now().plusDays(30);
+        if (employmentDate == null || employmentDate.isAfter(maxAllowedDate)) {
+            throw new IllegalArgumentException("Invalid Date Entry");
+        }
+        this.employmentDate = employmentDate;
+        if (position == null) {
+            throw new IllegalArgumentException("Position can't be NULL");
+        }
+        this.position = position;
+        this.id=null;
+    }
 
     public Employee(int id, String name, String phoneNumber, LocalDate employmentDate, EmployeePosition position) {
         if (id > 0) {
@@ -19,11 +41,11 @@ public class Employee {
 
         this.isActive = true;
 
-        if (name == null || name.isEmpty() || name.isBlank()) {
+        if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Invalid Name Entry");
         }
         this.name = name;
-        if (phoneNumber == null || phoneNumber.isEmpty() || phoneNumber.isBlank()) {
+        if (phoneNumber == null ||phoneNumber.isBlank()) {
             throw new IllegalArgumentException("Invalid Phone Number Entry");
         }
         this.phoneNumber = phoneNumber;
@@ -39,7 +61,7 @@ public class Employee {
         this.position = position;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -64,13 +86,13 @@ public class Employee {
     }
 
     public void setName(String name) {
-        if (name != null && !name.isEmpty() && !name.isBlank())
+        if (name != null && !name.isBlank())
             this.name = name;
         else throw new IllegalArgumentException("Invalid Name Entry");
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null || phoneNumber.isBlank() || phoneNumber.isEmpty()) {
+        if (phoneNumber == null || phoneNumber.isBlank()) {
             throw new IllegalArgumentException("Invalid Phone Number Entry");
         }
         this.phoneNumber = phoneNumber;
@@ -99,6 +121,15 @@ public class Employee {
                 ", position=" + position +
                 ", active=" + isActive +
                 '}';
+    }
+    public void assignId(int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("Employee ID must be positive");
+        }
+        if (this.id != null) {
+            throw new IllegalStateException("Employee already has an ID");
+        }
+        this.id = id;
     }
 
 }

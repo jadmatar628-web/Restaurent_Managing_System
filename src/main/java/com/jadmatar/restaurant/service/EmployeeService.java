@@ -2,31 +2,23 @@ package com.jadmatar.restaurant.service;
 
 import com.jadmatar.restaurant.domain.Employee;
 import com.jadmatar.restaurant.domain.EmployeePosition;
-import com.jadmatar.restaurant.repository.InMemoryEmployeeRepository;
+import com.jadmatar.restaurant.repository.EmployeeRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class EmployeeService {
-    private InMemoryEmployeeRepository employeeRepository;
-    private int nextId = 1;
-    public EmployeeService(InMemoryEmployeeRepository employeeRepository) {
+    private EmployeeRepository employeeRepository;
+    public EmployeeService(EmployeeRepository employeeRepository) {
         if (employeeRepository == null) {
             throw new IllegalArgumentException("Employee repository cannot be null");
         }
         this.employeeRepository = employeeRepository;
-        ArrayList<Employee> existingEmployees = employeeRepository.findAll();
-        for (Employee employee : existingEmployees) {
-            if (employee.getId() >= nextId) {
-                nextId = employee.getId() + 1;
-            }
-        }
     }
     public Employee createEmployee(String name, String phoneNumber, LocalDate employmentDate, EmployeePosition position)
     {
-        Employee newEmployee=new Employee(nextId,name,phoneNumber,employmentDate,position);
+        Employee newEmployee=new Employee(name,phoneNumber,employmentDate,position);
         employeeRepository.add(newEmployee);
-        nextId++;
         return newEmployee;
     }
     public Employee deactivateEmployee(int id)

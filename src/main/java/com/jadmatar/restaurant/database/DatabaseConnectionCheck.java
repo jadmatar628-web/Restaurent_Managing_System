@@ -1,9 +1,6 @@
 package com.jadmatar.restaurant.database;
 
 import java.sql.*;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.Executor;
 
 public class DatabaseConnectionCheck {
 

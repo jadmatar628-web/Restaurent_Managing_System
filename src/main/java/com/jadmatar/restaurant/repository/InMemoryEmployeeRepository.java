@@ -6,20 +6,34 @@ import java.util.ArrayList;
 
 public class InMemoryEmployeeRepository implements EmployeeRepository {
     private ArrayList<Employee> employees = new ArrayList<>(); //creating a new ArrayList (a dynamic array) that only accepts Employee (our predefined enum class) and using employees as reference to this array
-
-    public void add(Employee employee)//creating a public method called add that takes as parameter a new "employee" of type Employee
-    {
-        if (employee == null) //safety check
-        {
-            throw new IllegalArgumentException("NULL");
+private int nextId=1;
+    @Override
+    public void add(Employee employee) {
+        if (employee == null) {
+            throw new IllegalArgumentException("Employee cannot be null");
         }
-        for (int i = 0; i < employees.size(); i++) {
-            Employee exist = employees.get(i); //employees.get(i) return the whole object stored at index i, overwritten with every new i
-            if (exist.getId() == employee.getId()) {
-                throw new IllegalArgumentException("Employee is null or Employee ID already exists");
+
+        // Employee already has an ID, such as test setup data
+        if (employee.getId() != null) {
+            for (Employee existing : employees) {
+                if (existing.getId().equals(employee.getId())) {
+                    throw new IllegalArgumentException(
+                            "Employee ID already exists"
+                    );
+                }
+            }
+
+            if (employee.getId() >= nextId) {
+                nextId = employee.getId() + 1;
             }
         }
-        employees.add(employee);//using the .add built in method that registers the employee in the arraylist
+        // Newly created employee with no ID
+        else {
+            employee.assignId(nextId);
+            nextId++;
+        }
+
+        employees.add(employee);
     }
 
     public Employee findById(int id) {
