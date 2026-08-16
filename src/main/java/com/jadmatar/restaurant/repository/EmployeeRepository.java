@@ -8,7 +8,7 @@ public interface EmployeeRepository {
 
     void add(Employee employee);
 
-    Employee findById(int id);
+    Employee findById(Integer id);
 
     ArrayList<Employee> findAll();
 }

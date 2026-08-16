@@ -36,7 +36,7 @@ private int nextId=1;
         employees.add(employee);
     }
 
-    public Employee findById(int id) {
+    public Employee findById(Integer id) {
         for (int i = 0; i < employees.size(); i++) {
             if (employees.get(i).getId() == id) {
                 return employees.get(i);
