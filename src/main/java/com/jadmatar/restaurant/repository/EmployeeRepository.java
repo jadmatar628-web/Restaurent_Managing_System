@@ -11,4 +11,5 @@ public interface EmployeeRepository {
     Employee findById(Integer id);
 
     ArrayList<Employee> findAll();
+    void update(Employee employee);
 }
