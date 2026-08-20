@@ -2,14 +2,14 @@ package com.jadmatar.restaurant.service;
 
 import com.jadmatar.restaurant.domain.MenuCategory;
 import com.jadmatar.restaurant.domain.MenuItem;
-import com.jadmatar.restaurant.repository.MenuItemRepository;
+import com.jadmatar.restaurant.repository.InMemoryMenuItemRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
 public class MenuItemService {
-    private final MenuItemRepository menuItemRepository;
+    private final InMemoryMenuItemRepository menuItemRepository;
     private int nextId=1;
-    public MenuItemService(MenuItemRepository menuItemRepository){
+    public MenuItemService(InMemoryMenuItemRepository menuItemRepository){
         if(menuItemRepository==null)
         {
             throw new IllegalArgumentException("REPO IS NULL");
