@@ -3,9 +3,8 @@ package com.jadmatar.restaurant.repository;
 import com.jadmatar.restaurant.database.DatabaseConnection;
 import com.jadmatar.restaurant.domain.MenuCategory;
 import com.jadmatar.restaurant.domain.MenuItem;
-
-import java.lang.classfile.instruction.ReturnInstruction;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcMenuItemRepository implements MenuItemRepository{
@@ -69,11 +68,66 @@ public class JdbcMenuItemRepository implements MenuItemRepository{
 
     @Override
     public List<MenuItem> findAll() {
-        return List.of();
+        List<MenuItem> menuItems=new ArrayList<>();
+        String sql= """
+                select 
+                    MENU_ITEM_ID,
+                    ITEM_NAME,
+                    ITEM_PRICE,
+                    ITEM_CATEGORY,
+                    IS_AVAILABLE 
+                    from MENU_ITEM
+                    order by MENU_ITEM_ID""";
+        try(Connection connection=DatabaseConnection.getConnection();PreparedStatement preparedStatement=connection.prepareStatement(sql)){
+                try(ResultSet resultSet=preparedStatement.executeQuery()){
+                    while(resultSet.next()){
+                        menuItems.add(new MenuItem(resultSet.getInt("MENU_ITEM_ID"),
+                                        resultSet.getBigDecimal("ITEM_PRICE"),
+                                        resultSet.getString("ITEM_NAME")
+                                        ,MenuCategory.valueOf(resultSet.getString("MENU_Category")),
+                                        resultSet.getBoolean("IS_AVAILABLE"))
+                                );
+                    }
+                }
+        }catch (SQLException e){
+                throw new RuntimeException("Cannot load all items.",e);
+        }
+        return menuItems;
     }
-
     @Override
     public void update(MenuItem menuItem) {
+        if (menuItem == null) {
+            throw new IllegalArgumentException("Menu item cannot be null");
+        }
 
+        String sql = """
+            UPDATE MENU_ITEM
+            SET ITEM_PRICE = ?,
+                ITEM_NAME = ?,
+                ITEM_CATEGORY = ?,
+                IS_AVAILABLE = ?
+            WHERE MENU_ITEM_ID = ?
+            """;
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setBigDecimal(1, menuItem.getItemPrice());
+            statement.setString(2, menuItem.getItemName());
+            statement.setString(3, menuItem.getItemCategory().name());
+            statement.setBoolean(4, menuItem.isAvailable());
+            statement.setInt(5, menuItem.getId());
+
+            int affectedRows = statement.executeUpdate();
+
+            if (affectedRows != 1) {
+                throw new RuntimeException(
+                        "Expected to update 1 row but updated " + affectedRows
+                );
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Cannot update menu item.", e);
+        }
     }
 }
