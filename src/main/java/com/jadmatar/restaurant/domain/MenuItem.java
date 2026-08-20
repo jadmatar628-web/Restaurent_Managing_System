@@ -4,14 +4,14 @@ import java.math.BigDecimal;
 
 public class MenuItem {
 
-    private final int id;
+    private Integer id;
     private BigDecimal itemPrice;
     private String itemName;
-    private boolean available = true;
+    private boolean isAvailable;
     private MenuCategory itemCategory;
 
     public MenuItem(
-            int id,
+            Integer id,
             BigDecimal itemPrice,
             String itemName,
             MenuCategory itemCategory
@@ -45,6 +45,44 @@ public class MenuItem {
         this.itemPrice = itemPrice;
         this.itemName = itemName;
         this.itemCategory = itemCategory;
+        this.isAvailable=true;
+    }
+    public MenuItem(
+            Integer id,
+            BigDecimal itemPrice,
+            String itemName,
+            MenuCategory itemCategory,
+            boolean isAvailable
+    ) {
+        if (id <= 0) {
+            throw new IllegalArgumentException(
+                    "ID must be greater than zero"
+            );
+        }
+
+        if (itemPrice == null ||
+                itemPrice.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException(
+                    "Price cannot be null or negative"
+            );
+        }
+
+        if (itemName == null || itemName.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Name cannot be null or blank"
+            );
+        }
+
+        if (itemCategory == null) {
+            throw new IllegalArgumentException(
+                    "Category cannot be null"
+            );
+        }
+        this.isAvailable=isAvailable;
+        this.id = id;
+        this.itemPrice = itemPrice;
+        this.itemName = itemName;
+        this.itemCategory = itemCategory;
     }
 
     public int getId() {
@@ -64,7 +102,7 @@ public class MenuItem {
     }
 
     public boolean isAvailable() {
-        return available;
+        return isAvailable;
     }
 
     public void setItemPrice(BigDecimal itemPrice) {
@@ -99,11 +137,11 @@ public class MenuItem {
     }
 
     public void markAvailable() {
-        available = true;
+        isAvailable = true;
     }
 
     public void markUnavailable() {
-        available = false;
+        isAvailable = false;
     }
 
     @Override
@@ -113,7 +151,16 @@ public class MenuItem {
                 ", name='" + itemName + '\'' +
                 ", price=" + itemPrice +
                 ", category=" + itemCategory +
-                ", available=" + available +
+                ", isAvailable=" + isAvailable +
                 '}';
+    }
+    public void setId(int Id){
+        if(Id<=0){
+            throw new IllegalArgumentException("ID cannot be <=0");
+        }
+        if(this.id!=null){
+            throw new RuntimeException("Item ID already taken");
+        }
+        this.id=Id;
     }
 }
