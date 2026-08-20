@@ -2,7 +2,7 @@ package com.jadmatar.restaurant.ui;
 
 import com.jadmatar.restaurant.domain.MenuCategory;
 import com.jadmatar.restaurant.repository.InMemoryEmployeeRepository;
-import com.jadmatar.restaurant.repository.MenuItemRepository;
+import com.jadmatar.restaurant.repository.InMemoryMenuItemRepository;
 import com.jadmatar.restaurant.service.EmployeeService;
 import com.jadmatar.restaurant.service.MenuItemService;
 
@@ -33,8 +33,8 @@ class ConsoleMenuTest {
         InMemoryEmployeeRepository employeeRepository =
                 new InMemoryEmployeeRepository();
 
-        MenuItemRepository menuItemRepository =
-                new MenuItemRepository();
+        InMemoryMenuItemRepository menuItemRepository =
+                new InMemoryMenuItemRepository();
 
         employeeService =
                 new EmployeeService(employeeRepository);

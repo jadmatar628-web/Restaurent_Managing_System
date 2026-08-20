@@ -5,6 +5,7 @@ import com.jadmatar.restaurant.domain.Employee;
 import com.jadmatar.restaurant.domain.EmployeePosition;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class JdbcEmployeeRepository implements EmployeeRepository {
@@ -91,6 +92,59 @@ public class JdbcEmployeeRepository implements EmployeeRepository {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Couldn't list all employees", e);
+        }
+    }
+    @Override
+    public void update(Employee employee) {
+        if (employee == null) {
+            throw new IllegalArgumentException("Employee cannot be null");
+        }
+
+        if (employee.getId() == null || employee.getId() <= 0) {
+            throw new IllegalArgumentException(
+                    "Employee must have a valid ID"
+            );
+        }
+
+        String sql = """
+            UPDATE EMPLOYEE
+            SET NAME = ?,
+                PHONE_NUMBER = ?,
+                EMPLOYMENT_DATE = ?,
+                POSITION = ?,
+                IS_ACTIVE = ?
+            WHERE EMPLOYEE_ID = ?
+            """;
+
+        try (
+                Connection connection = DatabaseConnection.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            statement.setString(1, employee.getName());
+            statement.setString(2, employee.getPhoneNumber());
+            statement.setDate(
+                    3,
+                    Date.valueOf(employee.getEmploymentDate())
+            );
+            statement.setString(4, employee.getPosition().name());
+            statement.setBoolean(5, employee.isActive());
+            statement.setInt(6, employee.getId());
+
+            int affectedRows = statement.executeUpdate();
+
+            if (affectedRows != 1) {
+                throw new RuntimeException(
+                        "Expected to update one employee, but updated "
+                                + affectedRows
+                );
+            }
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(
+                    "Could not update employee with ID "
+                            + employee.getId(),
+                    e
+            );
         }
     }
 }
