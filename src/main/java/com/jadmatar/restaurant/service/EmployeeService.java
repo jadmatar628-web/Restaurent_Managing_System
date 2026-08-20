@@ -26,6 +26,7 @@ public class EmployeeService {
         Employee employee=employeeRepository.findById(id);
         if(employee==null) return null;
         employee.deactivate();
+        employeeRepository.update(employee);
         return employee;
     }
     public Employee reactivateEmployee(int id)
@@ -33,6 +34,7 @@ public class EmployeeService {
         Employee employee=employeeRepository.findById(id);
         if(employee==null) return null;
         employee.reactivate();
+        employeeRepository.update(employee);
         return employee;
     }
     public Employee findEmployeeById(int id)
@@ -49,18 +51,21 @@ public class EmployeeService {
         Employee temp=employeeRepository.findById(id);
         if(temp == null) return null;
         temp.setName(newName);
+        employeeRepository.update(temp);
         return temp;
     }
     public Employee updatePhoneNumber (int id, String newPhoneNumber){
         Employee employee=findEmployeeById(id);
         if(employee==null) return null;
         employee.setPhoneNumber(newPhoneNumber);
+        employeeRepository.update(employee);
         return employee;
     }
     public Employee updateEmployeePosition(int id, EmployeePosition position){
         Employee employee=findEmployeeById(id);
         if(employee==null) return null;
         employee.setPosition(position);
+        employeeRepository.update(employee);
         return employee;
     }
 
