@@ -2,7 +2,7 @@ package com.jadmatar.restaurant.service;
 
 import com.jadmatar.restaurant.domain.MenuCategory;
 import com.jadmatar.restaurant.domain.MenuItem;
-import com.jadmatar.restaurant.repository.MenuItemRepository;
+import com.jadmatar.restaurant.repository.InMemoryMenuItemRepository;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ class MenuItemServiceTest {
 
     @Test
     void createMenuItemCreatesAndStoresItem() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         MenuItem createdItem = service.createMenuItem(
@@ -49,7 +49,7 @@ class MenuItemServiceTest {
 
     @Test
     void createMenuItemGeneratesSequentialIds() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         MenuItem firstItem = service.createMenuItem(
@@ -70,7 +70,7 @@ class MenuItemServiceTest {
 
     @Test
     void constructorCalculatesNextIdFromExistingItems() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
 
         repository.addItem(
                 new MenuItem(
@@ -103,7 +103,7 @@ class MenuItemServiceTest {
 
     @Test
     void findItemByIdReturnsExistingItem() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         MenuItem createdItem = service.createMenuItem(
@@ -121,7 +121,7 @@ class MenuItemServiceTest {
 
     @Test
     void findItemByIdReturnsNullWhenItemDoesNotExist() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         MenuItem result = service.findItemById(999);
@@ -131,7 +131,7 @@ class MenuItemServiceTest {
 
     @Test
     void getAllMenuItemsReturnsEveryItem() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         MenuItem firstItem = service.createMenuItem(
@@ -155,7 +155,7 @@ class MenuItemServiceTest {
 
     @Test
     void updateItemPriceChangesPrice() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         MenuItem item = service.createMenuItem(
@@ -177,7 +177,7 @@ class MenuItemServiceTest {
 
     @Test
     void updateItemNameChangesNameAndReturnsItem() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         MenuItem originalItem = service.createMenuItem(
@@ -200,7 +200,7 @@ class MenuItemServiceTest {
 
     @Test
     void updateItemNameReturnsNullWhenItemDoesNotExist() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         MenuItem result = service.updateItemName(
@@ -213,7 +213,7 @@ class MenuItemServiceTest {
 
     @Test
     void updateItemCategoryChangesCategoryAndReturnsItem() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         MenuCategory originalCategory =
@@ -241,7 +241,7 @@ class MenuItemServiceTest {
 
     @Test
     void updateItemCategoryReturnsNullWhenItemDoesNotExist() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         MenuItem result = service.updateItemCategory(
@@ -254,7 +254,7 @@ class MenuItemServiceTest {
 
     @Test
     void markItemUnavailableMakesItemUnavailable() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         MenuItem originalItem = service.createMenuItem(
@@ -272,7 +272,7 @@ class MenuItemServiceTest {
 
     @Test
     void markItemAvailableMakesItemAvailable() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         MenuItem originalItem = service.createMenuItem(
@@ -292,7 +292,7 @@ class MenuItemServiceTest {
 
     @Test
     void availabilityOperationsReturnNullWhenItemDoesNotExist() {
-        MenuItemRepository repository = new MenuItemRepository();
+        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
         MenuItemService service = new MenuItemService(repository);
 
         assertNull(service.markItemAvailable(999));
