@@ -3,34 +3,49 @@ package com.jadmatar.restaurant.repository;
 import com.jadmatar.restaurant.domain.MenuItem;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class InMemoryMenuItemRepository implements MenuItemRepository {
-    private final ArrayList<MenuItem> menuItems = new ArrayList<>();
 
+    private final List<MenuItem> menuItems = new ArrayList<>();
+    private int nextId = 1;
+
+    @Override
     public void add(MenuItem item) {
+
         if (item == null) {
-            throw new IllegalArgumentException("ITEM CANNOT BE NULL");
+            throw new IllegalArgumentException(
+                    "ITEM CANNOT BE NULL"
+            );
         }
-        for (MenuItem old : menuItems) {
-            if (old.getId() == item.getId()) {
-                throw new IllegalArgumentException("ITEM ALREADY EXISTS");
-            }
-        }
+
+        item.setId(nextId++);
+
         menuItems.add(item);
     }
-    public MenuItem findById(int id){
+
+    @Override
+    public MenuItem findById(int id) {
+
         for (MenuItem menuItem : menuItems) {
+
             if (menuItem.getId() == id) {
                 return menuItem;
             }
         }
+
         return null;
     }
-    public ArrayList<MenuItem> findAll()
-    {
+
+    @Override
+    public List<MenuItem> findAll() {
         return new ArrayList<>(menuItems);
     }
-    public void update(MenuItem menuItem){
-        return ;
+
+    @Override
+    public void update(MenuItem menuItem) {
+        // Nothing needed for the in-memory version.
+        // The stored object and the object modified by the service
+        // are the same Java object.
     }
 }

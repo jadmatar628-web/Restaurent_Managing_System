@@ -12,8 +12,8 @@ import java.math.BigDecimal;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleMenu {
@@ -129,7 +129,7 @@ public class ConsoleMenu {
     }
 
     private void viewAllEmployees() {
-        ArrayList<Employee> employees =
+        List<Employee> employees =
                 employeeService.getAllEmployees();
 
         if (employees.isEmpty()) {
@@ -380,7 +380,7 @@ public class ConsoleMenu {
     }
 
     private void viewAllMenuItems() {
-        ArrayList<MenuItem> menuItems =
+        List<MenuItem> menuItems =
                 menuItemService.getAllMenuItems();
 
         if (menuItems.isEmpty()) {

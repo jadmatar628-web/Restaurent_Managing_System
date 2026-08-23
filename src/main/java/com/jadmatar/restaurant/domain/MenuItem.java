@@ -10,7 +10,7 @@ public class MenuItem {
     private boolean isAvailable;
     private MenuCategory itemCategory;
 
-    public MenuItem(
+    public MenuItem( //used by the database, id is supplied
             Integer id,
             BigDecimal itemPrice,
             String itemName,
@@ -48,9 +48,9 @@ public class MenuItem {
         this.isAvailable=true;
     }
     public MenuItem(
-            Integer id,
-            BigDecimal itemPrice,
+            int id,
             String itemName,
+            BigDecimal itemPrice,
             MenuCategory itemCategory,
             boolean isAvailable
     ) {
@@ -78,14 +78,42 @@ public class MenuItem {
                     "Category cannot be null"
             );
         }
-        this.isAvailable=isAvailable;
+
         this.id = id;
         this.itemPrice = itemPrice;
         this.itemName = itemName;
         this.itemCategory = itemCategory;
+        this.isAvailable=isAvailable;
     }
 
-    public int getId() {
+    public MenuItem(//used in the service layer, no need for ID
+            BigDecimal itemPrice,
+            String itemName,
+            MenuCategory itemCategory
+    ) {
+        if (itemPrice == null ||
+                itemPrice.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException(
+                    "Price cannot be null or negative"
+            );
+        }
+        if (itemName == null || itemName.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Name cannot be null or blank"
+            );
+        }
+        if (itemCategory == null) {
+            throw new IllegalArgumentException(
+                    "Category cannot be null"
+            );
+        }
+        this.itemPrice = itemPrice;
+        this.itemName = itemName;
+        this.itemCategory = itemCategory;
+        this.isAvailable=true;
+    }
+
+    public Integer getId() {
         return id;
     }
 
@@ -154,7 +182,7 @@ public class MenuItem {
                 ", isAvailable=" + isAvailable +
                 '}';
     }
-    public void setId(int Id){
+    public void setId(Integer Id){
         if(Id<=0){
             throw new IllegalArgumentException("ID cannot be <=0");
         }

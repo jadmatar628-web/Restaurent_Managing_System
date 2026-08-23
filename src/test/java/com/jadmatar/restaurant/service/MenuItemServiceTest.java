@@ -1,22 +1,53 @@
 package com.jadmatar.restaurant.service;
 
+import com.jadmatar.restaurant.database.DatabaseConnection;
 import com.jadmatar.restaurant.domain.MenuCategory;
 import com.jadmatar.restaurant.domain.MenuItem;
-import com.jadmatar.restaurant.repository.InMemoryMenuItemRepository;
+import com.jadmatar.restaurant.repository.JdbcMenuItemRepository;
+import com.jadmatar.restaurant.repository.MenuItemRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MenuItemServiceTest {
+
+    private MenuItemRepository repository;
+    private MenuItemService service;
+
     private MenuCategory category() {
         return MenuCategory.values()[0];
     }
 
+    @BeforeEach
+    void setUp() throws SQLException {
+
+        clearMenuItems();
+
+        repository = new JdbcMenuItemRepository();
+        service = new MenuItemService(repository);
+    }
+
+    private void clearMenuItems() throws SQLException {
+
+        String sql = "DELETE FROM MENU_ITEM";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.executeUpdate();
+        }
+    }
+
     @Test
     void constructorRejectsNullRepository() {
+
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new MenuItemService(null)
@@ -25,8 +56,6 @@ class MenuItemServiceTest {
 
     @Test
     void createMenuItemCreatesAndStoresItem() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
 
         MenuItem createdItem = service.createMenuItem(
                 new BigDecimal("5.50"),
@@ -34,23 +63,38 @@ class MenuItemServiceTest {
                 category()
         );
 
-        MenuItem storedItem = repository.findById(1);
+        assertNotNull(createdItem.getId());
 
-        assertSame(createdItem, storedItem);
-        assertEquals(1, createdItem.getId());
-        assertEquals("Burger", createdItem.getItemName());
+        MenuItem storedItem =
+                repository.findById(createdItem.getId());
+
+        assertNotNull(storedItem);
+
+        assertEquals(
+                createdItem.getId(),
+                storedItem.getId()
+        );
+
+        assertEquals(
+                "Burger",
+                storedItem.getItemName()
+        );
+
         assertEquals(
                 new BigDecimal("5.50"),
-                createdItem.getItemPrice()
+                storedItem.getItemPrice()
         );
-        assertEquals(category(), createdItem.getItemCategory());
-        assertTrue(createdItem.isAvailable());
+
+        assertEquals(
+                category(),
+                storedItem.getItemCategory()
+        );
+
+        assertTrue(storedItem.isAvailable());
     }
 
     @Test
-    void createMenuItemGeneratesSequentialIds() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
+    void createMenuItemGeneratesIncreasingIds() {
 
         MenuItem firstItem = service.createMenuItem(
                 new BigDecimal("5.00"),
@@ -64,47 +108,16 @@ class MenuItemServiceTest {
                 category()
         );
 
-        assertEquals(1, firstItem.getId());
-        assertEquals(2, secondItem.getId());
-    }
+        assertNotNull(firstItem.getId());
+        assertNotNull(secondItem.getId());
 
-    @Test
-    void constructorCalculatesNextIdFromExistingItems() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-
-        repository.addItem(
-                new MenuItem(
-                        3,
-                        new BigDecimal("5.00"),
-                        "Burger",
-                        category()
-                )
+        assertTrue(
+                secondItem.getId() > firstItem.getId()
         );
-
-        repository.addItem(
-                new MenuItem(
-                        7,
-                        new BigDecimal("2.50"),
-                        "Fries",
-                        category()
-                )
-        );
-
-        MenuItemService service = new MenuItemService(repository);
-
-        MenuItem createdItem = service.createMenuItem(
-                new BigDecimal("1.50"),
-                "Water",
-                category()
-        );
-
-        assertEquals(8, createdItem.getId());
     }
 
     @Test
     void findItemByIdReturnsExistingItem() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
 
         MenuItem createdItem = service.createMenuItem(
                 new BigDecimal("5.00"),
@@ -112,27 +125,43 @@ class MenuItemServiceTest {
                 category()
         );
 
-        MenuItem foundItem = service.findItemById(
-                createdItem.getId()
+        MenuItem foundItem =
+                service.findItemById(createdItem.getId());
+
+        assertNotNull(foundItem);
+
+        assertEquals(
+                createdItem.getId(),
+                foundItem.getId()
         );
 
-        assertSame(createdItem, foundItem);
+        assertEquals(
+                createdItem.getItemName(),
+                foundItem.getItemName()
+        );
+
+        assertEquals(
+                createdItem.getItemPrice(),
+                foundItem.getItemPrice()
+        );
+
+        assertEquals(
+                createdItem.getItemCategory(),
+                foundItem.getItemCategory()
+        );
     }
 
     @Test
     void findItemByIdReturnsNullWhenItemDoesNotExist() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
 
-        MenuItem result = service.findItemById(999);
+        MenuItem result =
+                service.findItemById(999999);
 
         assertNull(result);
     }
 
     @Test
     void getAllMenuItemsReturnsEveryItem() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
 
         MenuItem firstItem = service.createMenuItem(
                 new BigDecimal("5.00"),
@@ -146,17 +175,24 @@ class MenuItemServiceTest {
                 category()
         );
 
-        ArrayList<MenuItem> items = service.getAllMenuItems();
+        List<MenuItem> items =
+                service.getAllMenuItems();
 
         assertEquals(2, items.size());
-        assertSame(firstItem, items.get(0));
-        assertSame(secondItem, items.get(1));
+
+        assertEquals(
+                firstItem.getId(),
+                items.get(0).getId()
+        );
+
+        assertEquals(
+                secondItem.getId(),
+                items.get(1).getId()
+        );
     }
 
     @Test
     void updateItemPriceChangesPrice() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
 
         MenuItem item = service.createMenuItem(
                 new BigDecimal("5.00"),
@@ -169,16 +205,19 @@ class MenuItemServiceTest {
                 new BigDecimal("6.50")
         );
 
+        MenuItem updated =
+                repository.findById(item.getId());
+
+        assertNotNull(updated);
+
         assertEquals(
                 new BigDecimal("6.50"),
-                item.getItemPrice()
+                updated.getItemPrice()
         );
     }
 
     @Test
     void updateItemNameChangesNameAndReturnsItem() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
 
         MenuItem originalItem = service.createMenuItem(
                 new BigDecimal("5.00"),
@@ -191,20 +230,32 @@ class MenuItemServiceTest {
                 "Cheese Burger"
         );
 
-        assertSame(originalItem, updatedItem);
+        assertNotNull(updatedItem);
+
+        assertEquals(
+                originalItem.getId(),
+                updatedItem.getId()
+        );
+
         assertEquals(
                 "Cheese Burger",
-                originalItem.getItemName()
+                updatedItem.getItemName()
+        );
+
+        MenuItem storedItem =
+                repository.findById(originalItem.getId());
+
+        assertEquals(
+                "Cheese Burger",
+                storedItem.getItemName()
         );
     }
 
     @Test
     void updateItemNameReturnsNullWhenItemDoesNotExist() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
 
         MenuItem result = service.updateItemName(
-                999,
+                999999,
                 "Cheese Burger"
         );
 
@@ -213,8 +264,6 @@ class MenuItemServiceTest {
 
     @Test
     void updateItemCategoryChangesCategoryAndReturnsItem() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
 
         MenuCategory originalCategory =
                 MenuCategory.values()[0];
@@ -235,17 +284,27 @@ class MenuItemServiceTest {
                 newCategory
         );
 
-        assertSame(originalItem, updatedItem);
-        assertEquals(newCategory, originalItem.getItemCategory());
+        assertNotNull(updatedItem);
+
+        assertEquals(
+                newCategory,
+                updatedItem.getItemCategory()
+        );
+
+        MenuItem storedItem =
+                repository.findById(originalItem.getId());
+
+        assertEquals(
+                newCategory,
+                storedItem.getItemCategory()
+        );
     }
 
     @Test
     void updateItemCategoryReturnsNullWhenItemDoesNotExist() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
 
         MenuItem result = service.updateItemCategory(
-                999,
+                999999,
                 category()
         );
 
@@ -254,8 +313,6 @@ class MenuItemServiceTest {
 
     @Test
     void markItemUnavailableMakesItemUnavailable() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
 
         MenuItem originalItem = service.createMenuItem(
                 new BigDecimal("5.00"),
@@ -264,16 +321,21 @@ class MenuItemServiceTest {
         );
 
         MenuItem updatedItem =
-                service.markItemUnavailable(originalItem.getId());
+                service.markItemUnavailable(
+                        originalItem.getId()
+                );
 
-        assertSame(originalItem, updatedItem);
-        assertFalse(originalItem.isAvailable());
+        assertNotNull(updatedItem);
+        assertFalse(updatedItem.isAvailable());
+
+        MenuItem storedItem =
+                repository.findById(originalItem.getId());
+
+        assertFalse(storedItem.isAvailable());
     }
 
     @Test
     void markItemAvailableMakesItemAvailable() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
 
         MenuItem originalItem = service.createMenuItem(
                 new BigDecimal("5.00"),
@@ -281,21 +343,33 @@ class MenuItemServiceTest {
                 category()
         );
 
-        service.markItemUnavailable(originalItem.getId());
+        service.markItemUnavailable(
+                originalItem.getId()
+        );
 
         MenuItem updatedItem =
-                service.markItemAvailable(originalItem.getId());
+                service.markItemAvailable(
+                        originalItem.getId()
+                );
 
-        assertSame(originalItem, updatedItem);
-        assertTrue(originalItem.isAvailable());
+        assertNotNull(updatedItem);
+        assertTrue(updatedItem.isAvailable());
+
+        MenuItem storedItem =
+                repository.findById(originalItem.getId());
+
+        assertTrue(storedItem.isAvailable());
     }
 
     @Test
     void availabilityOperationsReturnNullWhenItemDoesNotExist() {
-        InMemoryMenuItemRepository repository = new InMemoryMenuItemRepository();
-        MenuItemService service = new MenuItemService(repository);
 
-        assertNull(service.markItemAvailable(999));
-        assertNull(service.markItemUnavailable(999));
+        assertNull(
+                service.markItemAvailable(999999)
+        );
+
+        assertNull(
+                service.markItemUnavailable(999999)
+        );
     }
 }

@@ -53,9 +53,9 @@ public class JdbcMenuItemRepository implements MenuItemRepository{
           try(ResultSet resultSet=statement.executeQuery()){
               if(resultSet.next()){
                   return new MenuItem(resultSet.getInt("MENU_ITEM_ID"),
-                          resultSet.getBigDecimal("ITEM_PRICE"),
                           resultSet.getString("ITEM_NAME"),
-                          MenuCategory.valueOf(resultSet.getString("MENU_CATEGORY")),
+                          resultSet.getBigDecimal("ITEM_PRICE"),
+                          MenuCategory.valueOf(resultSet.getString("ITEM_CATEGORY")),
                           resultSet.getBoolean("IS_AVAILABLE")
                           );
               }
@@ -75,16 +75,16 @@ public class JdbcMenuItemRepository implements MenuItemRepository{
                     ITEM_NAME,
                     ITEM_PRICE,
                     ITEM_CATEGORY,
-                    IS_AVAILABLE 
+                    IS_AVAILABLE
                     from MENU_ITEM
                     order by MENU_ITEM_ID""";
         try(Connection connection=DatabaseConnection.getConnection();PreparedStatement preparedStatement=connection.prepareStatement(sql)){
                 try(ResultSet resultSet=preparedStatement.executeQuery()){
                     while(resultSet.next()){
                         menuItems.add(new MenuItem(resultSet.getInt("MENU_ITEM_ID"),
+                                        resultSet.getString("ITEM_CATEGORY"),
                                         resultSet.getBigDecimal("ITEM_PRICE"),
-                                        resultSet.getString("ITEM_NAME")
-                                        ,MenuCategory.valueOf(resultSet.getString("MENU_Category")),
+                                       MenuCategory.valueOf(resultSet.getString("ITEM_CATEGORY")),
                                         resultSet.getBoolean("IS_AVAILABLE"))
                                 );
                     }

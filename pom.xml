@@ -35,9 +35,17 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.4</version>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.5.4</version>
+
+            <configuration>
+                <environmentVariables>
+                    <DB_URL>jdbc:sqlserver://localhost;instanceName=MSSQLSERVER02;databaseName=RestaurantManagementTest;encrypt=true;trustServerCertificate=true</DB_URL>
+                    <DB_USER>restaurant_app</DB_USER>
+                    <DB_PASSWORD>${env.DB_PASSWORD}</DB_PASSWORD>
+                </environmentVariables>
+            </configuration>
             </plugin>
         </plugins>
     </build>
