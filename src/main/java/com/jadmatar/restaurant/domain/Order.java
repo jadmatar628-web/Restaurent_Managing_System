@@ -141,4 +141,14 @@ public class Order {
         }
         return true;
     }
+    public void assignId(int id) {
+        if (id < 1) {
+            throw new IllegalArgumentException("Order ID must be positive");
+        }
+        if (this.id != null) {
+            throw new IllegalStateException("Order already has an ID");
+        }
+
+        this.id = id;
+    }
 }
