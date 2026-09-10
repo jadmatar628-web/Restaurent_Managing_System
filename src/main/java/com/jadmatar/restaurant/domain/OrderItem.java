@@ -1,41 +1,79 @@
 package com.jadmatar.restaurant.domain;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class OrderItem {
+    private static final BigDecimal ONE_HUNDRED =
+            BigDecimal.valueOf(100);
+
     private final MenuItem menuItem;
     private final BigDecimal unitPrice;
     private final BigDecimal discountPercentage;
-    private int quantity;
+    private final int quantity;
 
-    public OrderItem(MenuItem menuItem, int quantity, BigDecimal unitPrice, BigDecimal discountPercentage) {
+    public OrderItem(
+            MenuItem menuItem,
+            int quantity,
+            BigDecimal unitPrice,
+            BigDecimal discountPercentage
+    ) {
         if (menuItem == null) {
-            throw new IllegalArgumentException("Menu Item cannot be null");
+            throw new IllegalArgumentException(
+                    "Menu item cannot be null"
+            );
         }
-        this.menuItem = menuItem;
+
+        if (menuItem.getId() == null) {
+            throw new IllegalArgumentException(
+                    "Menu item must already be stored in the database"
+            );
+        }
+
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity cannot be 0");
+            throw new IllegalArgumentException(
+                    "Quantity must be greater than zero"
+            );
         }
-        this.quantity = quantity;
+
         if (unitPrice == null) {
-            throw new IllegalArgumentException("Unit price cannot be null");
+            throw new IllegalArgumentException(
+                    "Unit price cannot be null"
+            );
         }
+
         if (unitPrice.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Price cannot be less than 0");
+            throw new IllegalArgumentException(
+                    "Unit price cannot be negative"
+            );
         }
+
+        BigDecimal actualDiscount = validateDiscount(discountPercentage);
+
+        this.menuItem = menuItem;
+        this.quantity = quantity;
         this.unitPrice = unitPrice;
-        if (discountPercentage == null) {
-            discountPercentage = BigDecimal.ZERO;
+        this.discountPercentage = actualDiscount;
+    }
+
+    private static BigDecimal validateDiscount(BigDecimal discountPercentage) {
+        BigDecimal actualDiscount =
+                discountPercentage == null
+                        ? BigDecimal.ZERO
+                        : discountPercentage;
+
+        if (actualDiscount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException(
+                    "Discount cannot be negative"
+            );
         }
 
-        if (discountPercentage.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Discount cannot be negative");
+        if (actualDiscount.compareTo(ONE_HUNDRED) > 0) {
+            throw new IllegalArgumentException(
+                    "Discount cannot exceed 100%"
+            );
         }
-
-        if (discountPercentage.compareTo(BigDecimal.valueOf(100)) > 0) {
-            throw new IllegalArgumentException("Discount cannot exceed 100%");
-        }
-        this.discountPercentage = discountPercentage;
+        return actualDiscount;
     }
 
     public MenuItem getMenuItem() {
@@ -55,10 +93,15 @@ public class OrderItem {
     }
 
     public BigDecimal totalPrice() {
-        BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
+        BigDecimal subtotal =
+                unitPrice.multiply(BigDecimal.valueOf(quantity));
 
-        BigDecimal discountAmount = subtotal.multiply(discountPercentage).divide(BigDecimal.valueOf(100));
+        BigDecimal remainingPercentage =
+                ONE_HUNDRED.subtract(discountPercentage);
 
-        return subtotal.subtract(discountAmount);
+        return subtotal
+                .multiply(remainingPercentage)
+                .divide(ONE_HUNDRED, 2, RoundingMode.HALF_UP);
     }
+
 }

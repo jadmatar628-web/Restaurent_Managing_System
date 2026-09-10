@@ -7,5 +7,5 @@ public interface OrderRepository {
     Order add(Order order);
     Order findById(int id);
     List<Order> findAll();
-    void update(Order order);
+    void updateOrderStatus(Order order);
 }
