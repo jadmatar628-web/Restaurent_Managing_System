@@ -37,6 +37,31 @@ public class OrderService {
     public List<Order> findAll(){
         return repository.findAll();
     }
+    public void markOrderPreparing(int id){
+        Order order=findOrderById(id);
+        order.markPreparing();
+        repository.updateOrderStatus(order);
+    }
+    public void markOrderReady(int id){
+        Order order=findOrderById(id);
+        order.markReady();
+        repository.updateOrderStatus(order);
+    }
+    public void markOrderPickedUp(int id){
+        Order order=findOrderById(id);
+        order.markPickedUp();
+        repository.updateOrderStatus(order);
+    }
+    public void markOrderDispatched(int id){
+        Order order=findOrderById(id);
+        order.markDispatched();
+        repository.updateOrderStatus(order);
+    }
+    public void markOrderOnTheWay(int id){
+        Order order=findOrderById(id);
+        order.markOnTheWay();
+        repository.updateOrderStatus(order);
+    }
     public void completeOrder(int id){
         Order order=findOrderById(id);
         order.markCompleted();

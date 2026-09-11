@@ -263,6 +263,8 @@ public class OrderServiceTest {
 
         Order order = createValidOpenOrder();
 
+        order.changeOrderType(OrderType.PICKUP);
+
         orderService.placeOrder(order);
 
         /*
@@ -275,6 +277,9 @@ public class OrderServiceTest {
         repo.updateOrderStatus(order);
 
         order.markReady();
+        repo.updateOrderStatus(order);
+
+        order.markPickedUp();
         repo.updateOrderStatus(order);
 
         // Act
@@ -348,12 +353,17 @@ public class OrderServiceTest {
 
         Order order = createValidOpenOrder();
 
+        order.changeOrderType(OrderType.PICKUP);
+
         orderService.placeOrder(order);
 
         order.markPreparing();
         repo.updateOrderStatus(order);
 
         order.markReady();
+        repo.updateOrderStatus(order);
+
+        order.markPickedUp();
         repo.updateOrderStatus(order);
 
         order.markCompleted();
